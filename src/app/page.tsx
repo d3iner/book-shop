@@ -1,26 +1,42 @@
 'use client'
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useCallback, useEffect, useMemo} from 'react';
 import Image from 'next/image'
+import { Book, BookState } from '@/interface/interfaces';
+import { useRouter } from 'next/navigation';
+import { isLogged, logOut, verifyStorage } from '@/services/loginService';
+import { getBooks, setBooks } from '@/services/booksService';
 
-interface Book{
-  id: number;
-  name: string;
-  author: string;
-  publishDate: string;
-  state:  'Prestado' | 'Dañado' | 'Perdido' | 'Disponible'
-}
+
 
 export default function Home() {
+
+  const router = useRouter()
 
   const [name, setName] = useState<string>('')
   const [author, setAuthor] = useState<string>('')
   const [publishDate, setPublishDate] = useState<string>('')
   const [state, setState] = useState<string>('Prestado')
   const [bookList, setBookList] = useState<Book[]>([])
+  const [allUpdated, setAllUpdated] = useState<boolean>(false)
 
   useEffect(()=>{
-    console.log(bookList)
+    if (!isLogged()) {
+      router.push('/login')
+    }
+  }, [])
+
+  useEffect(()=>{
+    setBookList(getBooks())
+    setAllUpdated(true)
+  }, [])
+
+  useEffect(()=>{
+    if (allUpdated) {
+      setBooks(bookList)
+    }
   }, [bookList])
+
+  useEffect(()=> verifyStorage(), [])
 
   const clear = useCallback(()=>{
     setName('')
@@ -55,9 +71,8 @@ export default function Home() {
       name: name,
       author: author,
       publishDate: publishDate,
-      state: state as  'Prestado' | 'Dañado' | 'Perdido' | 'Disponible'
+      state: state as  BookState
     }
-    console.log(book)
     if (isValid(book)) {
       setBookList([...bookList, book])
       clear()
@@ -67,12 +82,19 @@ export default function Home() {
   const deleteBook = useCallback((id: number)=>{
     console.log(id)
     const newBookList = bookList.filter(book => book.id !== id)
-    console.log(newBookList)
     setBookList(newBookList)
   }, [bookList])
 
+  const logout = useCallback(()=>{
+    logOut()
+    router.push('/login')
+  }, [])
+
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
+      <button type='button' onClick={logout} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 border border-red-700 rounded">
+            Log out
+      </button>
       <form className='' onSubmit={onSubmit}>
         <div className='grid gap-6 mb-6 md:grid-cols-2'>
           <div>
@@ -92,7 +114,7 @@ export default function Home() {
           </div>
           <div>
               <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Estado</label>
-              <select defaultValue={state} value={state} onChange={e => setState(e.target.value )}
+              <select value={state} onChange={e => setState(e.target.value )}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
               >
                 <option value="Prestado">Prestado</option>
