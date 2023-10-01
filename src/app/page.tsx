@@ -1,9 +1,9 @@
 'use client'
 import React, {useState, useCallback, useEffect, useMemo} from 'react';
 import Image from 'next/image'
-import { Book, BookState } from '@/interface/interfaces';
+import { Book, BookState, Credentials } from '@/interface/interfaces';
 import { useRouter } from 'next/navigation';
-import { isLogged, logOut, verifyStorage } from '@/services/loginService';
+import { getUser, isLogged, logOut, verifyStorage } from '@/services/loginService';
 import { getBooks, setBooks } from '@/services/booksService';
 
 
@@ -18,6 +18,7 @@ export default function Home() {
   const [state, setState] = useState<string>('Prestado')
   const [bookList, setBookList] = useState<Book[]>([])
   const [allUpdated, setAllUpdated] = useState<boolean>(false)
+  const [user, setUser] = useState<Credentials>({} as Credentials)
 
   useEffect(()=>{
     if (!isLogged()) {
@@ -28,6 +29,7 @@ export default function Home() {
   useEffect(()=>{
     setBookList(getBooks())
     setAllUpdated(true)
+    setUser(getUser())
   }, [])
 
   useEffect(()=>{
@@ -92,6 +94,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
+    <p className="">{user.email}</p>
       <button type='button' onClick={logout} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 border border-red-700 rounded">
             Log out
       </button>

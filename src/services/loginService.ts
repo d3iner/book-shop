@@ -13,7 +13,7 @@ function firstTime(){
     BooksisFirstTime()
 }
 
-function getUser(){
+export function getUser(): Credentials{
     const user: Credentials = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) ?? '')
     return user
 }
