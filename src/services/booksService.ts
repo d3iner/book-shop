@@ -6,8 +6,7 @@ export function isFirstTime(){
 }
 
 export function getBooks(){
-    const allBooks = JSON.parse(localStorage.getItem(BOOKS_STORAGE_KEY) ?? '')
-    console.log(allBooks)
+    const allBooks = JSON.parse(localStorage.getItem(BOOKS_STORAGE_KEY) ?? '{}')
     return allBooks
 }
 

@@ -14,7 +14,7 @@ function firstTime(){
 }
 
 export function getUser(): Credentials{
-    const user: Credentials = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) ?? '')
+    const user: Credentials = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) ?? '{}')
     return user
 }
 
